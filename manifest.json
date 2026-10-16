@@ -1,0 +1,11 @@
+{
+  "name": "FREEHILDA",
+  "short_name": "FREEHILDA",
+  "description": "Compagnon de configuration et d'entraînement",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111116",
+  "theme_color": "#111116",
+  "icons": [{"src":"./icon.png","sizes":"512x512","type":"image/png","purpose":"any"}]
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111116"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="FREEHILDA">
+<link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./icon.png"><title>FREEHILDA</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111116;color:#f7f7f8;font:16px system-ui,-apple-system,sans-serif}header{text-align:center;padding:35px 16px 22px;background:#1d1d25;border-bottom:2px solid #ed343c}h1{letter-spacing:3px;color:#ff434b;margin:0}small,.muted{color:#b7b7c4}main{max-width:480px;margin:auto;padding:20px}.card{background:#202029;border:1px solid #3a3a47;padding:20px;border-radius:16px;margin:0 0 16px}h2{margin-top:0}.option{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #363641}input[type=checkbox],input[type=range]{accent-color:#ff4048}input[type=range]{width:100%}input[type=password]{width:100%;padding:14px;border-radius:8px;border:1px solid #666;background:#111116;color:white;font-size:16px}button{width:100%;padding:14px;border:0;border-radius:9px;background:#e52e35;color:white;font-size:15px;font-weight:700;margin-top:12px}.secondary{background:#424250}.hidden{display:none}.success{color:#58e79c}.error{color:#ff8080}.note{font-size:13px;line-height:1.5;color:#b7b7c4}label{display:block;margin-top:14px}.value{color:#ff626a;font-weight:700}
+</style></head><body>
+<header><h1>FREEHILDA</h1><small>GAMING COMPANION · V1.0</small></header>
+<main><section id="login" class="card"><h2>🔐 Accès démo</h2><label for="password">Code d'accès</label><input id="password" type="password" autocomplete="off" placeholder="Mot de passe"><button id="enter">ENTRER</button><p id="error" class="error" role="alert"></p><p class="note">Accès local de démonstration uniquement : le code est visible dans le fichier source. N'utilise pas un mot de passe personnel.</p></section>
+<section id="panel" class="hidden">
+<div class="card"><h2>🔥 Tableau de bord</h2><p>État : <span class="success">PRÊT</span></p><p class="note">Cette application conserve des profils d'entraînement. Elle n'interagit pas avec Free Fire et n'active aucune fonction dans le jeu.</p></div>
+<div class="card"><h2>🎯 Préférences d'entraînement</h2>
+<div class="option"><label for="headshot">Pratique de visée</label><input id="headshot" type="checkbox"></div>
+<div class="option"><label for="rotation">Pratique de rotation</label><input id="rotation" type="checkbox"></div>
+<div class="option"><label for="gloo">Pratique Gloo Wall</label><input id="gloo" type="checkbox"></div></div>
+<div class="card"><h2>⚙️ Profil de sensibilité</h2>
+<label for="general">Générale : <output id="generalValue" class="value">100</output></label><input id="general" type="range" min="0" max="200" value="100">
+<label for="redDot">Point rouge : <output id="redDotValue" class="value">100</output></label><input id="redDot" type="range" min="0" max="200" value="100">
+<label for="scope">Lunette : <output id="scopeValue" class="value">100</output></label><input id="scope" type="range" min="0" max="200" value="100">
+<p class="note">Note tes valeurs ici, puis reporte-les manuellement dans les réglages du jeu.</p></div>
+<div class="card"><button id="save">ENREGISTRER</button><button id="reset" class="secondary">RÉINITIALISER</button><button id="logout" class="secondary">DÉCONNEXION</button><p id="message" class="success" role="status"></p></div></section></main>
+<script>
+"use strict";
+const DEMO_PASSWORD="hilda97600";
+const ids=["headshot","rotation","gloo","general","redDot","scope"];
+const $=id=>document.getElementById(id);
+function values(){["general","redDot","scope"].forEach(id=>$(id+"Value").textContent=$(id).value)}
+function load(){try{const data=JSON.parse(localStorage.getItem("freehilda_settings")||"{}");ids.forEach(id=>{if(Object.prototype.hasOwnProperty.call(data,id)){const el=$(id);if(el.type==="checkbox")el.checked=data[id]===true;else if(Number.isFinite(Number(data[id])))el.value=String(data[id])}})}catch(e){console.warn("Sauvegarde illisible")}values()}
+$("enter").addEventListener("click",()=>{if($("password").value!==DEMO_PASSWORD){$("error").textContent="Code incorrect";return}$("error").textContent="";$("password").value="";$("login").classList.add("hidden");$("panel").classList.remove("hidden");load()});
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("enter").click()});
+$("logout").addEventListener("click",()=>{$("panel").classList.add("hidden");$("login").classList.remove("hidden");$("message").textContent=""});
+$("save").addEventListener("click",()=>{const data={};ids.forEach(id=>{const el=$(id);data[id]=el.type==="checkbox"?el.checked:Number(el.value)});try{localStorage.setItem("freehilda_settings",JSON.stringify(data));$("message").textContent="Profil enregistré sur cet appareil."}catch(e){$("message").textContent="Sauvegarde indisponible sur cet appareil."}});
+$("reset").addEventListener("click",()=>{localStorage.removeItem("freehilda_settings");ids.forEach(id=>{const el=$(id);if(el.type==="checkbox")el.checked=false;else el.value=100});values();$("message").textContent="Profil réinitialisé."});
+["general","redDot","scope"].forEach(id=>$(id).addEventListener("input",values));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.warn));
+</script></body></html>
